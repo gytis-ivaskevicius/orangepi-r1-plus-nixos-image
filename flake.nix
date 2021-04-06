@@ -7,21 +7,37 @@
       url = "github:Mic92/nixos-aarch64-images";
       flake = false;
     };
+
     uboot = {
       url = "github:u-boot/u-boot";
       flake = false;
     };
+
+    ethSrc = {
+      url = github:wget/realtek-r8152-linux;
+      flake = false;
+    };
   };
 
-  outputs = inputs@{ self, flake-utils, nixpkgs, uboot, aarch-images }:
+  outputs = inputs@{ self, flake-utils, nixpkgs, uboot, aarch-images, ethSrc }:
     let
       buildImage = pkgs.callPackage "${aarch-images}/pkgs/build-image" { };
-      pkgs = import nixpkgs { system = "aarch64-linux"; };
+      pkgs = import nixpkgs {
+        system = "aarch64-linux";
+        overlays = [
+
+          (final: pkgs: {
+            r8152 = (import ./module.nix { inherit pkgs ethSrc; });
+          })
+        ];
+      };
     in
     flake-utils.lib.eachDefaultSystem (_: rec {
 
+      packages.r8152 = (import ./module.nix { inherit pkgs ethSrc; });
+
       packages.sdImage = (import "${nixpkgs}/nixos" {
-        configuration = ./sd.nix;
+        configuration = import ./sd.nix { inherit pkgs; lib = pkgs.lib; };
         inherit (pkgs) system;
       }).config.system.build.sdImage;
 
@@ -38,6 +54,7 @@
         src = uboot;
         version = uboot.rev;
 
+        patches = [./add-board-nanopi-r2s.patch];
         BL31 = "${pkgs.armTrustedFirmwareRK3328}/bl31.elf";
         filesToInstall = [ "u-boot.itb" "idbloader.img" ];
       };

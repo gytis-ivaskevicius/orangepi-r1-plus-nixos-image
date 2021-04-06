@@ -16,6 +16,22 @@
         "type": "github"
       }
     },
+    "ethSrc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1603440761,
+        "narHash": "sha256-82ZxTmNczQVWcm5bfeT6+lGzjCa+QCaMYxhix9FxAuo=",
+        "owner": "wget",
+        "repo": "realtek-r8152-linux",
+        "rev": "006c40bcdf56c1701c9eadc34e29662bab5948ca",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wget",
+        "repo": "realtek-r8152-linux",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "locked": {
         "lastModified": 1614513358,
@@ -50,6 +66,7 @@
     "root": {
       "inputs": {
         "aarch-images": "aarch-images",
+        "ethSrc": "ethSrc",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "uboot": "uboot"
